@@ -2,6 +2,8 @@ package repository
 
 import (
 	"afizsavage/api-poc/entity"
+	"strconv"
+	"time"
 
 	"gorm.io/gorm"
 
@@ -13,6 +15,7 @@ type ListingRepository interface {
 	Update(listing entity.Listing)
 	Delete(listing entity.Listing)
 	FindAll() []entity.Listing
+	GenerateUniqueID() string
 }
 
 type database struct {
@@ -20,7 +23,7 @@ type database struct {
 }
 
 func NewListingRepository() ListingRepository {
-	dsn := "host=127.0.0.1 user=postgres password=password dbname=postgres port=51699 sslmode=disable"
+	dsn := "host=127.0.0.1 user=postgres password=password dbname=postgres port=51620 sslmode=disable"
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
@@ -51,5 +54,14 @@ func (db *database) FindAll() []entity.Listing {
 	var listings []entity.Listing
 	db.connection.Find(&listings)
 	return listings
+}
+
+func (db *database) GenerateUniqueID() string {
+	
+	// Get the current timestamp in Unix format
+	timestamp := time.Now().Unix()
+
+	// Convert the timestamp to a string and return
+	return strconv.FormatInt(timestamp, 10)
 }
 

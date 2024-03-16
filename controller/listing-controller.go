@@ -14,6 +14,7 @@ type ListingController interface {
 	Save(ctx *gin.Context) entity.Listing
 	Update(ctx *gin.Context)
 	Delete(ctx *gin.Context)
+    GenerateUniqueID() string
 }
 
 type controller struct {
@@ -24,6 +25,10 @@ func New(service service.ListingService) ListingController {
 	return &controller{
 		service: service,
 	}
+}
+
+func (c *controller) GenerateUniqueID() string {
+	return c.service.GenerateUniqueID()
 }
 
 func (c *controller) FindAll() []entity.Listing {

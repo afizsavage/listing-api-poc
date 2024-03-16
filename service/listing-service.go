@@ -10,10 +10,11 @@ type ListingService interface {
 	Update(listing entity.Listing)
 	Delete(listing entity.Listing)
 	FindAll() []entity.Listing
+	GenerateUniqueID() string
 }
 
 type listingService struct {
-	listingRepository  repository.ListingRepository
+	listingRepository repository.ListingRepository
 }
 
 func New(repo repository.ListingRepository) ListingService {
@@ -22,18 +23,24 @@ func New(repo repository.ListingRepository) ListingService {
 	}
 }
 
+func (service *listingService) GenerateUniqueID() string {
+	return service.listingRepository.GenerateUniqueID()
+}
+
+
 func (service *listingService) Save(listing entity.Listing) entity.Listing {
 	service.listingRepository.Save(listing)
 	return listing
 }
- 
- func (service *listingService) Update(listing entity.Listing) {
+
+func (service *listingService) Update(listing entity.Listing) {
 	service.listingRepository.Update(listing)
- }
+}
+
 func (service *listingService) Delete(listing entity.Listing) {
 	service.listingRepository.Delete(listing)
 }
 
-func (service *listingService)	FindAll() []entity.Listing {
+func (service *listingService) FindAll() []entity.Listing {
 	return service.listingRepository.FindAll()
 }
