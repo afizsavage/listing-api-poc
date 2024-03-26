@@ -17,6 +17,12 @@ var (
 func main() {
 	server := gin.Default()
 
+		// Disable CORS
+		server.Use(func(ctx *gin.Context) {
+			ctx.Header("Access-Control-Allow-Origin", "*")
+			ctx.Next()
+		})
+
 	server.GET("/listings/generate_unique_id", func(ctx *gin.Context) {
 		ctx.JSON(200, propertyController.GenerateUniqueID())
 	})
@@ -26,7 +32,7 @@ func main() {
 	})
 	
 	server.POST("/listings", func(ctx *gin.Context) {
-		ctx.JSON(200, propertyController.Save(ctx))
+		ctx.JSON(201, propertyController.Save(ctx))
 	})
 
 	server.PUT("/listings/:id", func(ctx *gin.Context) {
