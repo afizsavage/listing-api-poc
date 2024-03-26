@@ -5,6 +5,7 @@ import (
 	"afizsavage/api-poc/repository"
 	"afizsavage/api-poc/service"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,10 +19,7 @@ func main() {
 	server := gin.Default()
 
 		// Disable CORS
-		server.Use(func(ctx *gin.Context) {
-			ctx.Header("Access-Control-Allow-Origin", "*")
-			ctx.Next()
-		})
+		server.Use(cors.Default())
 
 	server.GET("/listings/generate_unique_id", func(ctx *gin.Context) {
 		ctx.JSON(200, propertyController.GenerateUniqueID())

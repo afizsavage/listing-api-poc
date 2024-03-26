@@ -10,6 +10,6 @@ type Listing struct {
 	Bathrooms  uint   `json:"bathrooms"`
 	Type       string `json:"type"`
 	Title      string `json:"title"`
-	Latitude   string `json:"latitude"`
-	Longitude  string `json:"longitude"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }

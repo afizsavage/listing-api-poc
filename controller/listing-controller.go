@@ -47,8 +47,6 @@ func (c *controller) Save(ctx *gin.Context) entity.Listing {
 
 	c.service.Save(listing)
 
-	ctx.IndentedJSON(http.StatusCreated, listing)
-
 	// Return the listing after successful processing
 	return listing
 }
