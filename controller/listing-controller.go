@@ -11,7 +11,7 @@ import (
 
 type ListingController interface {
 	FindAll() []entity.Listing
-	Save(ctx *gin.Context) entity.Listing
+	Save(ctx *gin.Context) 
 	Update(ctx *gin.Context)
 	Delete(ctx *gin.Context)
     GenerateUniqueID() string
@@ -35,12 +35,12 @@ func (c *controller) FindAll() []entity.Listing {
 	return c.service.FindAll()
 }
 
-func (c *controller) Save(ctx *gin.Context) entity.Listing {
-	var listing entity.Listing
-	ctx.BindJSON(&listing)
-	c.service.Save(listing)
+func (c *controller) Save(ctx *gin.Context) {
+    var listing entity.Listing
+    ctx.BindJSON(&listing)
+    createdListing := c.service.Save(listing)
 
-	return listing
+    ctx.JSON(http.StatusCreated, gin.H{"message": "Listing created successfully", "listing": createdListing})
 }
 
 func (c *controller) Update(ctx *gin.Context) {

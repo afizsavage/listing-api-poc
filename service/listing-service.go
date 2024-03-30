@@ -27,10 +27,9 @@ func (service *listingService) GenerateUniqueID() string {
 	return service.listingRepository.GenerateUniqueID()
 }
 
-
 func (service *listingService) Save(listing entity.Listing) entity.Listing {
-	service.listingRepository.Save(listing)
-	return listing
+    savedListing := service.listingRepository.Save(listing)
+    return savedListing
 }
 
 func (service *listingService) Update(listing entity.Listing) {

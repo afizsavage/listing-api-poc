@@ -11,7 +11,7 @@ import (
 )
 
 type ListingRepository interface {
-	Save(listing entity.Listing)
+	Save(listing entity.Listing) entity.Listing
 	Update(listing entity.Listing)
 	Delete(listing entity.Listing)
 	FindAll() []entity.Listing
@@ -23,7 +23,7 @@ type database struct {
 }
 
 func NewListingRepository() ListingRepository {
-	dsn := "host=127.0.0.1 user=postgres password=password dbname=postgres port=51620 sslmode=disable"
+	dsn := "host=127.0.0.1 user=postgres password=password dbname=postgres port=5432 sslmode=disable"
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
@@ -38,8 +38,9 @@ func NewListingRepository() ListingRepository {
 	}
 }
 
-func (db *database) Save(listing entity.Listing) {
-	db.connection.Create(&listing)
+func (db *database) Save(listing entity.Listing) entity.Listing {
+    db.connection.Create(&listing)
+    return listing
 }
 
 func (db *database) Update(listing entity.Listing) {

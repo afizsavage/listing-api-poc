@@ -5,6 +5,7 @@ import (
 	"afizsavage/api-poc/repository"
 	"afizsavage/api-poc/service"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,6 +18,8 @@ var (
 func main() {
 	server := gin.Default()
 
+	server.Use(cors.Default())
+
 	server.GET("/listings/generate_unique_id", func(ctx *gin.Context) {
 		ctx.JSON(200, propertyController.GenerateUniqueID())
 	})
@@ -26,7 +29,7 @@ func main() {
 	})
 	
 	server.POST("/listings", func(ctx *gin.Context) {
-		ctx.JSON(200, propertyController.Save(ctx))
+		 propertyController.Save(ctx)
 	})
 
 	server.PUT("/listings/:id", func(ctx *gin.Context) {
