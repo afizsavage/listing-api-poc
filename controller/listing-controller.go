@@ -43,22 +43,32 @@ func (c *controller) Save(ctx *gin.Context) {
     ctx.JSON(http.StatusCreated, gin.H{"message": "Listing created successfully", "listing": createdListing})
 }
 
+// Update updates a listing based on the ID provided in the URL path.
 func (c *controller) Update(ctx *gin.Context) {
-    idStr := ctx.Param("id") // Extracting the ID from the URI
-    convertedID, err := strconv.ParseUint(idStr, 10, 64)
-    if err != nil {
-        // Handle the error (e.g., return an error response)
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
-        return
-    }
+	idStr := ctx.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
 
-    var listing entity.Listing
-    ctx.BindJSON(&listing)
-    // Set the ID of the listing before updating
-    listing.ID = convertedID
+	var listing entity.Listing
+	if err := ctx.ShouldBindJSON(&listing); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-    c.service.Update(listing)
+	listing.ID = id // Set the ID from the URL path
+
+	updatedListing, err := c.service.Update(listing)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update listing"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "Listing updated successfully", "listing": updatedListing})
 }
+
 
 func (c *controller) Delete(ctx *gin.Context) {
     idStr := ctx.Param("id") // Extracting the ID from the URI
