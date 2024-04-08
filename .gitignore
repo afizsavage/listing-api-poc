@@ -1,0 +1,23 @@
+# Compiled Go binary files
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Generated files
+bin/
+obj/
+
+# Dependency directories
+vendor/
+node_modules/
+
+# IDE-specific files
+.vscode/
+.idea/
+
+# Log files
+*.log
+
+# Environment variables file
+.env

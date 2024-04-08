@@ -14,7 +14,7 @@ type ListingController interface {
 	Save(ctx *gin.Context) 
 	Update(ctx *gin.Context)
 	Delete(ctx *gin.Context)
-    GenerateUniqueID() string
+    GenerateUniqueID() uint64
 }
 
 type controller struct {
@@ -27,7 +27,7 @@ func New(service service.ListingService) ListingController {
 	}
 }
 
-func (c *controller) GenerateUniqueID() string {
+func (c *controller) GenerateUniqueID() uint64 {
 	return c.service.GenerateUniqueID()
 }
 
@@ -71,19 +71,19 @@ func (c *controller) Update(ctx *gin.Context) {
 
 
 func (c *controller) Delete(ctx *gin.Context) {
-    idStr := ctx.Param("id") // Extracting the ID from the URI
-    convertedID, err := strconv.ParseUint(idStr, 10, 64)
-    if err != nil {
-        // Handle the error (e.g., return an error response)
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
-        return
-    }
+	idStr := ctx.Param("id") // Extracting the ID from the URI
+	convertedID, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		// Handle the error (e.g., return an error response)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
 
-    var listing entity.Listing
-    // No need to bind the JSON to the listing variable if you're not using it
+	var listing entity.Listing
+	// No need to bind the JSON to the listing variable if you're not using it
 
-    // Set the ID of the listing before deleting
-    listing.ID = convertedID
+	// Set the ID of the listing before deleting
+	listing.ID = convertedID
 
-    c.service.Delete(listing)
+	c.service.Delete(listing)
 }

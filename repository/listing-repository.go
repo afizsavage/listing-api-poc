@@ -4,7 +4,6 @@ import (
 	"afizsavage/api-poc/entity"
 
 	"errors"
-	"strconv"
 	"time"
 
 	"gorm.io/driver/postgres"
@@ -16,7 +15,7 @@ type ListingRepository interface {
 	Update(listing entity.Listing) (entity.Listing, error)
 	Delete(listing entity.Listing)
 	FindAll() []entity.Listing
-	GenerateUniqueID() string
+	GenerateUniqueID() uint64
 	GetByID(id uint64) (entity.Listing, error)
 }
 
@@ -65,20 +64,16 @@ func (db *database) FindAll() []entity.Listing {
 	return listings
 }
 
-func (db *database) GenerateUniqueID() string {
-	
-	// Get the current timestamp in Unix format
-	timestamp := time.Now().Unix()
-
-	// Convert the timestamp to a string and return
-	return strconv.FormatInt(timestamp, 10)
+func (db *database) GenerateUniqueID() uint64 {
+    // Get the current timestamp in Unix format and return it as uint64
+    return uint64(time.Now().Unix())
 }
 
 func (db *database) GetByID(id uint64) (entity.Listing, error) {
     var listing entity.Listing
     if err := db.connection.First(&listing, id).Error; err != nil {
         if errors.Is(err, gorm.ErrRecordNotFound) {
-            return entity.Listing{}, errors.New("Listing not found")
+            return entity.Listing{}, errors.New("listing not found")
         }
         return entity.Listing{}, err
     }

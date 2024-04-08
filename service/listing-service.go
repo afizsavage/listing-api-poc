@@ -11,7 +11,7 @@ type ListingService interface {
 	Update(listing entity.Listing) (entity.Listing, error)
 	Delete(listing entity.Listing)
 	FindAll() []entity.Listing
-	GenerateUniqueID() string
+	GenerateUniqueID() uint64
 }
 
 type listingService struct {
@@ -24,7 +24,7 @@ func New(repo repository.ListingRepository) ListingService {
 	}
 }
 
-func (service *listingService) GenerateUniqueID() string {
+func (service *listingService) GenerateUniqueID() uint64 {
 	return service.listingRepository.GenerateUniqueID()
 }
 
