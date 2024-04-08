@@ -40,7 +40,7 @@ func (c *controller) Save(ctx *gin.Context) {
     ctx.BindJSON(&listing)
     createdListing := c.service.Save(listing)
 
-    ctx.JSON(http.StatusCreated, gin.H{"message": "Listing created successfully", "listing": createdListing})
+    ctx.JSON(http.StatusCreated, gin.H{"message": "Listing created successfully", "data": createdListing})
 }
 
 // Update updates a listing based on the ID provided in the URL path.
@@ -66,7 +66,7 @@ func (c *controller) Update(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Listing updated successfully", "listing": updatedListing})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Listing updated successfully", "data": updatedListing})
 }
 
 
