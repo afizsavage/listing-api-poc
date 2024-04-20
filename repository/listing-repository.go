@@ -2,6 +2,7 @@ package repository
 
 import (
 	"afizsavage/api-poc/entity"
+	"fmt"
 
 	"errors"
 	"time"
@@ -11,12 +12,12 @@ import (
 )
 
 type ListingRepository interface {
-	Save(listing entity.Listing) entity.Listing
+	Save(listing entity.Listing) (entity.Listing, error )
 	Update(listing entity.Listing) (entity.Listing, error)
-	Delete(listing entity.Listing)
+	Delete(listing entity.Listing) error
 	FindAll() []entity.Listing
 	GenerateUniqueID() uint64
-	GetByID(id uint64) (entity.Listing, error)
+	GetByID(id uint) (entity.Listing, error)
 }
 
 type database struct {
@@ -32,6 +33,7 @@ func NewListingRepository() ListingRepository {
 		panic("Failed to connect database")
 	}
 
+	db.AutoMigrate(&entity.Photo{})
 	db.AutoMigrate(&entity.Listing{})
 
 	return &database{
@@ -39,23 +41,29 @@ func NewListingRepository() ListingRepository {
 	}
 }
 
-func (db *database) Save(listing entity.Listing) entity.Listing {
-    db.connection.Create(&listing)
-    return listing
+func (db *database) Save(listing entity.Listing) (entity.Listing, error) {
+    if err := db.connection.Create(&listing).Error; err != nil {
+        fmt.Println("Database error:", err) // Print the error message for debugging
+        return entity.Listing{}, err
+    }
+    return listing, nil
 }
 
+func (db *database) Delete(listing entity.Listing) error {
+    if err := db.connection.Delete(&listing).Error; err != nil {
+        return err
+    }
+    return nil
+}
 // Update updates a listing in the database.
 func (db *database) Update(listing entity.Listing) (entity.Listing, error) {
 	// Perform database update operation
 	if err := db.connection.Save(&listing).Error; err != nil {
+		fmt.Println("update database error", err)
+
 		return entity.Listing{}, err
 	}
 	return listing, nil
-}
-
-
-func (db *database) Delete(listing entity.Listing) {
-	db.connection.Delete(&listing)
 }
 
 func (db *database) FindAll() []entity.Listing {
@@ -69,7 +77,7 @@ func (db *database) GenerateUniqueID() uint64 {
     return uint64(time.Now().Unix())
 }
 
-func (db *database) GetByID(id uint64) (entity.Listing, error) {
+func (db *database) GetByID(id uint) (entity.Listing, error) {
     var listing entity.Listing
     if err := db.connection.First(&listing, id).Error; err != nil {
         if errors.Is(err, gorm.ErrRecordNotFound) {

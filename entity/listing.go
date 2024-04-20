@@ -1,11 +1,19 @@
 package entity
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/shopspring/decimal"
 )
 
+type Photo struct {
+	gorm.Model
+	Title	string  `json:"title" gorm:"type:varchar(250)"`
+	Path	string  `json:"path" gorm:"type:varchar(250)"`
+	ListingID	string `json:"listing_ID" gorm:"type:varchar(250)"`
+}
+
 type Listing struct {
-	ID         uint64  `json:"id" gorm:"primary_key;auto_increment"`
+	gorm.Model
 	Country    string  `json:"country" gorm:"type:varchar(200)"`
 	City       string  `json:"city" gorm:"type:varchar(200)"`
 	Address    string  `json:"address" gorm:"type:varchar(200)"`
@@ -16,4 +24,5 @@ type Listing struct {
 	Latitude   decimal.Decimal `json:"latitude" gorm:"type:decimal(20,8);"`
 	Longitude  decimal.Decimal `json:"longitude" gorm:"type:decimal(20,8);"`
 	ExternalID  uint64  `json:"external_d" gorm:"type:bigint"`
+	Photos   []Photo    `gorm:"foreignKey:ListingID;references:ID;"`
 }
