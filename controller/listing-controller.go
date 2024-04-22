@@ -24,6 +24,8 @@ type ListingController interface {
     GenerateUniqueID() uint64
 	UploadPhoto(ctx *gin.Context)
 	GetImageURL(ctx *gin.Context)
+	GetByID(ctx *gin.Context) entity.Listing
+
 }
 
 type controller struct {
@@ -70,6 +72,33 @@ func (c *controller) GetImageURL(ctx *gin.Context)  {
         ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to stream image"})
         return
     }
+}
+
+
+func (c *controller) GetByID(ctx *gin.Context) entity.Listing  {
+	idStr := ctx.Param("id")
+	id64, err := strconv.ParseUint(idStr, 10, 64)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return entity.Listing{}
+	}
+
+	id := uint(id64)
+
+	returnedListing, err := c.service.GetByID(id)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return entity.Listing{}
+	}
+
+
+	ctx.JSON(http.StatusOK, gin.H{ "data": returnedListing})
+
+
+	return returnedListing
+	
 }
 
 func (c *controller) Save(ctx *gin.Context) {

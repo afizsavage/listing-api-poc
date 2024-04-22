@@ -7,22 +7,22 @@ import (
 
 type Photo struct {
 	gorm.Model
-	Title	string  `json:"title" gorm:"type:varchar(250)"`
-	Path	string  `json:"path" gorm:"type:varchar(250)"`
-	ListingID	string `json:"listing_ID" gorm:"type:varchar(250)"`
+	Title     string `json:"title" gorm:"type:varchar(250)"`
+	Path      string `json:"path" gorm:"type:varchar(250)"`
+	ListingID uint   // Corrected field name for foreign key
 }
 
 type Listing struct {
 	gorm.Model
-	Country    string  `json:"country" gorm:"type:varchar(200)"`
-	City       string  `json:"city" gorm:"type:varchar(200)"`
-	Address    string  `json:"address" gorm:"type:varchar(200)"`
-	Bedrooms   string  `json:"bedrooms" gorm:"type:varchar(50)"`
-	Bathrooms  string  `json:"bathrooms" gorm:"type:varchar(50)"`
-	Type       string  `json:"type" gorm:"type:varchar(50)"`
-	Title      string  `json:"title" gorm:"type:varchar(50)"`
+	Country    string         `json:"country" gorm:"type:varchar(200)"`
+	City       string         `json:"city" gorm:"type:varchar(200)"`
+	Address    string         `json:"address" gorm:"type:varchar(200)"`
+	Bedrooms   string         `json:"bedrooms" gorm:"type:varchar(50)"`
+	Bathrooms  string         `json:"bathrooms" gorm:"type:varchar(50)"`
+	Type       string         `json:"type" gorm:"type:varchar(50)"`
+	Title      string         `json:"title" gorm:"type:varchar(50)"`
 	Latitude   decimal.Decimal `json:"latitude" gorm:"type:decimal(20,8);"`
 	Longitude  decimal.Decimal `json:"longitude" gorm:"type:decimal(20,8);"`
-	ExternalID  uint64  `json:"external_d" gorm:"type:bigint"`
-	Photos   []Photo    `gorm:"foreignKey:ListingID;references:ID;"`
+	ExternalID uint64         `json:"external_d" gorm:"type:bigint"`
+	Photos     []Photo 
 }

@@ -15,7 +15,7 @@ type ListingRepository interface {
 	Save(listing entity.Listing) (entity.Listing, error )
 	Update(listing entity.Listing) (entity.Listing, error)
 	Delete(listing entity.Listing) error
-	FindAll() []entity.Listing
+	FindAll() ([]entity.Listing, error)
 	GenerateUniqueID() uint64
 	GetByID(id uint) (entity.Listing, error)
 }
@@ -66,10 +66,10 @@ func (db *database) Update(listing entity.Listing) (entity.Listing, error) {
 	return listing, nil
 }
 
-func (db *database) FindAll() []entity.Listing {
+func (db *database) FindAll() ([]entity.Listing, error) {
 	var listings []entity.Listing
-	db.connection.Find(&listings)
-	return listings
+    err := db.connection.Model(&entity.Listing{}).Preload("Photos").Find(&listings).Error
+    return listings, err
 }
 
 func (db *database) GenerateUniqueID() uint64 {
@@ -79,7 +79,7 @@ func (db *database) GenerateUniqueID() uint64 {
 
 func (db *database) GetByID(id uint) (entity.Listing, error) {
     var listing entity.Listing
-    if err := db.connection.First(&listing, id).Error; err != nil {
+    if err := db.connection.Preload("Photos").First(&listing, id).Error; err != nil {
         if errors.Is(err, gorm.ErrRecordNotFound) {
             return entity.Listing{}, errors.New("listing not found")
         }

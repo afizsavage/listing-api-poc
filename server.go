@@ -34,6 +34,10 @@ func main() {
 		ctx.JSON(200, propertyController.FindAll())
 	})
 
+	server.GET("/listings/:id", func(ctx *gin.Context) {
+		 propertyController.GetByID(ctx)
+	})
+
 	server.GET("/listings/photos/:photo-name", func(ctx *gin.Context) {
 		propertyController.GetImageURL(ctx)
 	})

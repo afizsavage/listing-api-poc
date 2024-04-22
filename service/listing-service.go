@@ -3,6 +3,7 @@ package service
 import (
 	"afizsavage/api-poc/entity"
 	"afizsavage/api-poc/repository"
+	"fmt"
 
 	"github.com/minio/minio-go/v7"
 )
@@ -14,6 +15,7 @@ type ListingService interface {
 	FindAll() []entity.Listing
 	GenerateUniqueID() uint64
 	UploadPhoto(uint, *minio.UploadInfo) (entity.Listing, error)
+	GetByID(uint) (entity.Listing, error)
 }
 
 type listingService struct {
@@ -48,7 +50,7 @@ func (service *listingService) UploadPhoto(id uint, uploadedInfo *minio.UploadIn
 	newPhoto  := entity.Photo {
 		Title: uploadedInfo.Key,
 		Path: uploadedInfo.Key,
-		ListingID: string(rune(existingListing.ID)) ,
+		ListingID: existingListing.ID ,
 	}
 
 	existingListing.Photos = append(existingListing.Photos, newPhoto)
@@ -99,6 +101,23 @@ func (service *listingService) Delete(listing entity.Listing)   error{
 }
 
 func (service *listingService) FindAll() []entity.Listing {
-	return service.listingRepository.FindAll()
+	listings, err :=  service.listingRepository.FindAll()
+	
+	if err != nil {
+        fmt.Println("find all listing error", err)
+    }
+
+	return listings
+}
+
+func (service *listingService) GetByID(id uint) (entity.Listing, error) {
+	listing, err := service.listingRepository.GetByID(id)
+
+	if err != nil {
+        fmt.Println("get listing by id err", err)
+    }
+
+	return listing, err
+
 }
 
