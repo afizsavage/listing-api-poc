@@ -17,7 +17,7 @@ import (
 )
 
 type ListingController interface {
-	FindAll() []entity.Listing
+	GetAll() []entity.Listing
 	Save(ctx *gin.Context) 
 	Update(ctx *gin.Context)
 	Delete(ctx *gin.Context)
@@ -49,8 +49,8 @@ func (c *controller) GenerateUniqueID() uint64 {
 	return c.service.GenerateUniqueID()
 }
 
-func (c *controller) FindAll() []entity.Listing {
-	return c.service.FindAll()
+func (c *controller) GetAll() []entity.Listing {
+	return c.service.GetAll()
 }
 
 func (c *controller) GetImageURL(ctx *gin.Context)  {

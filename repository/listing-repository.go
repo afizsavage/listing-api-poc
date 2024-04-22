@@ -15,7 +15,7 @@ type ListingRepository interface {
 	Save(listing entity.Listing) (entity.Listing, error )
 	Update(listing entity.Listing) (entity.Listing, error)
 	Delete(listing entity.Listing) error
-	FindAll() ([]entity.Listing, error)
+	GetAll() ([]entity.Listing, error)
 	GenerateUniqueID() uint64
 	GetByID(id uint) (entity.Listing, error)
 }
@@ -66,10 +66,11 @@ func (db *database) Update(listing entity.Listing) (entity.Listing, error) {
 	return listing, nil
 }
 
-func (db *database) FindAll() ([]entity.Listing, error) {
+func (db *database) GetAll() ([]entity.Listing, error) {
 	var listings []entity.Listing
     err := db.connection.Model(&entity.Listing{}).Preload("Photos").Find(&listings).Error
-    return listings, err
+    
+	return listings, err
 }
 
 func (db *database) GenerateUniqueID() uint64 {

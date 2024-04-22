@@ -12,7 +12,7 @@ type ListingService interface {
 	Save(entity.Listing)  (entity.Listing, error)
 	Update(listing entity.Listing) (entity.Listing, error)
 	Delete(listing entity.Listing) error
-	FindAll() []entity.Listing
+	GetAll() []entity.Listing
 	GenerateUniqueID() uint64
 	UploadPhoto(uint, *minio.UploadInfo) (entity.Listing, error)
 	GetByID(uint) (entity.Listing, error)
@@ -100,8 +100,8 @@ func (service *listingService) Delete(listing entity.Listing)   error{
 	return err
 }
 
-func (service *listingService) FindAll() []entity.Listing {
-	listings, err :=  service.listingRepository.FindAll()
+func (service *listingService) GetAll() []entity.Listing {
+	listings, err :=  service.listingRepository.GetAll()
 	
 	if err != nil {
         fmt.Println("find all listing error", err)

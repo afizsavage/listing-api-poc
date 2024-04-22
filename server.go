@@ -31,7 +31,7 @@ func main() {
 	})
 
 	server.GET("/listings", func(ctx *gin.Context) {
-		ctx.JSON(200, propertyController.FindAll())
+		ctx.JSON(200, propertyController.GetAll())
 	})
 
 	server.GET("/listings/:id", func(ctx *gin.Context) {
