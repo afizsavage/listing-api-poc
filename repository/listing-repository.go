@@ -73,18 +73,22 @@ func (db *database) GetAll() ([]entity.Listing, error) {
 	return listings, err
 }
 
-func (db *database) GenerateUniqueID() uint64 {
-    // Get the current timestamp in Unix format and return it as uint64
-    return uint64(time.Now().Unix())
-}
-
 func (db *database) GetByID(id uint) (entity.Listing, error) {
     var listing entity.Listing
-    if err := db.connection.Preload("Photos").First(&listing, id).Error; err != nil {
+	
+    if err := db.connection.Model(&entity.Listing{}).Preload("Photos").First(&listing, id).Error; err != nil {
         if errors.Is(err, gorm.ErrRecordNotFound) {
             return entity.Listing{}, errors.New("listing not found")
         }
         return entity.Listing{}, err
     }
+
     return listing, nil
 }
+
+func (db *database) GenerateUniqueID() uint64 {
+    // Get the current timestamp in Unix format and return it as uint64
+    return uint64(time.Now().Unix())
+}
+
+
