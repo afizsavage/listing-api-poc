@@ -90,5 +90,3 @@ func (db *database) GenerateUniqueID() uint64 {
     // Get the current timestamp in Unix format and return it as uint64
     return uint64(time.Now().Unix())
 }
-
-

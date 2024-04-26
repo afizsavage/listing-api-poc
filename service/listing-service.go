@@ -4,6 +4,7 @@ import (
 	"afizsavage/api-poc/entity"
 	"afizsavage/api-poc/repository"
 	"fmt"
+	"path/filepath"
 
 	"github.com/minio/minio-go/v7"
 )
@@ -48,7 +49,7 @@ func (service *listingService) UploadPhoto(id uint, uploadedInfo *minio.UploadIn
 	}
 
 	newPhoto  := entity.Photo {
-		Title: uploadedInfo.Key,
+		Title: filepath.Base(uploadedInfo.Key),
 		Path: uploadedInfo.Key,
 		ListingID: existingListing.ID ,
 	}
