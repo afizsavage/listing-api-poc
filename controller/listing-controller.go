@@ -21,6 +21,7 @@ type ListingController interface {
 	Save(ctx *gin.Context) 
 	Update(ctx *gin.Context)
 	Delete(ctx *gin.Context)
+	DeletePhoto(ctx *gin.Context)
     GenerateUniqueID() uint64
 	UploadPhoto(ctx *gin.Context)
 	GetImageURL(ctx *gin.Context)
@@ -179,6 +180,7 @@ func (c *controller) UploadPhoto(ctx *gin.Context) {
 func (c *controller) Update(ctx *gin.Context) {
     idStr := ctx.Param("id")
     id, err := strconv.ParseUint(idStr, 10, 64)
+
     if err != nil {
         ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
         return
@@ -217,4 +219,34 @@ func (c *controller) Delete(ctx *gin.Context) {
     listing.ID = uint(convertedID)
 
     c.service.Delete(listing)
+}
+
+func (c *controller) DeletePhoto(ctx *gin.Context) {
+	idStr := ctx.Param("id")
+	photoIDStr := ctx.Param("photo-id")
+
+    listingID, err := strconv.ParseUint(idStr, 10, 64)
+    if err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Listing ID"})
+        return
+    }
+
+	photoID, err := strconv.ParseUint(photoIDStr, 10, 64)
+	if err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Photo ID"})
+        return
+    }
+	
+	updatedListing, err := c.service.DeletePhoto(uint(listingID), uint(photoID))
+	
+	
+	if err != nil {
+		fmt.Println("update listing error:", err) // Print the error message for debugging
+
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload photo"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "Photo updated successfully", "data": updatedListing})
+
 }

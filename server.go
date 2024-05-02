@@ -38,7 +38,7 @@ func main() {
 		 propertyController.GetByID(ctx)
 	})
 
-	server.GET("/listings/photos/:photo-name", func(ctx *gin.Context) {
+	server.GET("/listings/:id/photos/:photo-name", func(ctx *gin.Context) {
 		propertyController.GetImageURL(ctx)
 	})
 
@@ -56,6 +56,10 @@ func main() {
 
 	server.DELETE("/listings/:id", func(ctx *gin.Context) {
 		propertyController.Delete(ctx)
+	})
+
+	server.DELETE("/listings/:id/photos/:photo-id", func(ctx *gin.Context) {
+		propertyController.DeletePhoto(ctx)
 	})
 
 	server.Run()
