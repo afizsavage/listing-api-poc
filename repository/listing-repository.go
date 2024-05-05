@@ -15,6 +15,7 @@ type ListingRepository interface {
 	Save(listing entity.Listing) (entity.Listing, error )
 	Update(listing entity.Listing) (entity.Listing, error)
 	Delete(listing entity.Listing) error
+	DeletePhoto(photo entity.Photo) error
 	GetAll() ([]entity.Listing, error)
 	GenerateUniqueID() uint64
 	GetByID(id uint) (entity.Listing, error)
@@ -49,12 +50,7 @@ func (db *database) Save(listing entity.Listing) (entity.Listing, error) {
     return listing, nil
 }
 
-func (db *database) Delete(listing entity.Listing) error {
-    if err := db.connection.Delete(&listing).Error; err != nil {
-        return err
-    }
-    return nil
-}
+
 // Update updates a listing in the database.
 func (db *database) Update(listing entity.Listing) (entity.Listing, error) {
 	// Perform database update operation
@@ -89,4 +85,18 @@ func (db *database) GetByID(id uint) (entity.Listing, error) {
 func (db *database) GenerateUniqueID() uint64 {
     // Get the current timestamp in Unix format and return it as uint64
     return uint64(time.Now().Unix())
+}
+
+func (db *database) Delete(listing entity.Listing) error {
+    if err := db.connection.Delete(&listing).Error; err != nil {
+        return err
+    }
+    return nil
+}
+
+func (db *database) DeletePhoto(photo entity.Photo) error {
+    if err := db.connection.Delete(&photo).Error; err != nil {
+        return err
+    }
+    return nil
 }

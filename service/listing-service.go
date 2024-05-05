@@ -13,7 +13,7 @@ type ListingService interface {
 	Save(entity.Listing)  (entity.Listing, error)
 	Update(listing entity.Listing) (entity.Listing, error)
 	Delete(listing entity.Listing) error
-	DeletePhoto(listingID uint, photoID uint ) (entity.Listing, error)
+	DeletePhoto(listingID uint, photo entity.Photo ) (entity.Listing, error)
 	GetAll() []entity.Listing
 	GenerateUniqueID() uint64
 	UploadPhoto(uint, *minio.UploadInfo) (entity.Listing, error)
@@ -125,32 +125,17 @@ func (service *listingService) Delete(listing entity.Listing)   error{
 	return err
 }
 
-func (service *listingService) DeletePhoto(listingID uint, photoID uint)  ( entity.Listing,error){
+func (service *listingService) DeletePhoto(listingID uint, photo entity.Photo)  ( entity.Listing,error){
 
-	existingListing, err := service.listingRepository.GetByID(listingID)
-
-    if err != nil {
+	err := service.listingRepository.DeletePhoto(photo)
+	if err != nil {
         return entity.Listing{}, err
     }
 
-	indexToRemove := -1
-	for i, photo := range existingListing.Photos {
-		if photo.ID == photoID {
-			indexToRemove = i
-			break
-		}
-	}
-
-	if indexToRemove != -1 {
-		existingListing.Photos = append(existingListing.Photos[:indexToRemove], existingListing.Photos[indexToRemove+1:]...)
-	}
-
-	updatedListing, err := service.listingRepository.Update(existingListing)
-
+	updatedListing, err := service.listingRepository.GetByID(listingID)
 	if err != nil {
-		return entity.Listing{},  err
-	}
+        return entity.Listing{}, err
+    }
 
 	return updatedListing, err	
-
 }

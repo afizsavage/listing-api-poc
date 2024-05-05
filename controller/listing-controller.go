@@ -225,8 +225,9 @@ func (c *controller) DeletePhoto(ctx *gin.Context) {
 	idStr := ctx.Param("id")
 	photoIDStr := ctx.Param("photo-id")
 
+
     listingID, err := strconv.ParseUint(idStr, 10, 64)
-    if err != nil {
+	if err != nil {
         ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Listing ID"})
         return
     }
@@ -236,17 +237,21 @@ func (c *controller) DeletePhoto(ctx *gin.Context) {
         ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Photo ID"})
         return
     }
+
+	var photo entity.Photo
+
+	photo.ID = uint(photoID)
 	
-	updatedListing, err := c.service.DeletePhoto(uint(listingID), uint(photoID))
+	updatedListing, err := c.service.DeletePhoto(uint(listingID),photo)
 	
 	
 	if err != nil {
 		fmt.Println("update listing error:", err) // Print the error message for debugging
 
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload photo"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed delete photo"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Photo updated successfully", "data": updatedListing})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Photo  successfully", "data": updatedListing})
 
 }
