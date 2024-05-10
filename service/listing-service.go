@@ -86,6 +86,8 @@ func (service *listingService) Update(listing entity.Listing) (entity.Listing, e
     existingListing.Latitude = listing.Latitude
     existingListing.Longitude = listing.Longitude
     existingListing.ExternalID = listing.ExternalID
+	existingListing.Amenities = listing.Amenities
+
 
     updatedListing, err := service.listingRepository.Update(existingListing)
     if err != nil {

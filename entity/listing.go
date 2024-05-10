@@ -2,6 +2,7 @@ package entity
 
 import (
 	"github.com/jinzhu/gorm"
+	"github.com/lib/pq"
 	"github.com/shopspring/decimal"
 )
 
@@ -11,7 +12,6 @@ type Photo struct {
 	Path      string `json:"Path" gorm:"type:varchar(250)"`
 	ListingID uint   
 }
-
 type Listing struct {
 	gorm.Model
 	Country    string         `json:"Country" gorm:"type:varchar(200)"`
@@ -21,8 +21,9 @@ type Listing struct {
 	Bathrooms  string         `json:"Bathrooms" gorm:"type:varchar(50)"`
 	Type       string         `json:"Type" gorm:"type:varchar(50)"`
 	Title      string         `json:"Title" gorm:"type:varchar(50)"`
-	Latitude   decimal.Decimal `json:"Latitude" gorm:"type:decimal(20,8);"`
-	Longitude  decimal.Decimal `json:"Longitude" gorm:"type:decimal(20,8);"`
+	Latitude   decimal.Decimal`json:"Latitude" gorm:"type:decimal(20,8);"`
+	Longitude  decimal.Decimal`json:"Longitude" gorm:"type:decimal(20,8);"`
 	ExternalID uint64         `json:"External_d" gorm:"type:bigint"`
-	Photos     []Photo 
+	Amenities  pq.StringArray `gorm:"type:text[]"`
+	Photos     []Photo
 }
