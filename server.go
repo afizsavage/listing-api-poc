@@ -42,7 +42,7 @@ func main() {
 		propertyController.GetImageURL(ctx)
 	})
 
-	server.POST("/listings/:id/upload/photo", func(ctx *gin.Context) {
+	server.POST("/listings/:id/photos", func(ctx *gin.Context) {
 		propertyController.UploadPhoto(ctx)
 	})
 	

@@ -8,7 +8,9 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -116,64 +118,94 @@ func (c *controller) Save(ctx *gin.Context) {
 }
 
 func (c *controller) UploadPhoto(ctx *gin.Context) {
+
+	err := ctx.Request.ParseMultipartForm(10 << 20) // Parse up to 10 MB of form data
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse form data"})
+		return
+	}
+
 	idStr := ctx.Param("id")
 	id64, err := strconv.ParseUint(idStr, 10, 64)
 
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Listing ID"})
 		return
 	}
 
 	id := uint(id64)
 
-	file, fileHeader, err := ctx.Request.FormFile("photo")
-
-	if err != nil {
-		   ctx.JSON(http.StatusBadRequest, gin.H{"error": "No photo provided"})
-		   return
-	}
-
-	defer file.Close()
-   
-	fileName := fileHeader.Filename
-	fileSize := fileHeader.Size
-
-	fileBytes, err := io.ReadAll(file)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid file"})
+	form := ctx.Request.MultipartForm
+	if form == nil || form.File == nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "No photo provided"})
 		return
 	}
 
-	detectedFileType := http.DetectContentType(fileBytes)
-	parsedFT := strings.Split(detectedFileType, ";")
+	files := form.File["photos"]
+	if len(files) == 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "No photo provided"})
+		return
+	}
 
-	objectName := "listing-photos/" + fileName
+	var uploadedFiles []entity.Photo
 
- 
-	uploadedPhoto, err := minioClient.PutObject(
-			context.Background(),  
+
+	for _, fileHeader := range files {
+		file, err := fileHeader.Open()
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file"})
+			return
+		}
+		defer file.Close()
+
+		fileName := fileHeader.Filename
+		fileSize := fileHeader.Size
+
+		fileBytes, err := ioutil.ReadAll(file)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file"})
+			return
+		}
+
+		detectedFileType := http.DetectContentType(fileBytes)
+		parsedFT := strings.Split(detectedFileType, ";")
+
+		objectName := "listing-photos/" + fileName
+
+		// Upload the file to your storage (e.g., MinIO)
+		uploadedPhoto, err := minioClient.PutObject(
+			ctx,
 			bucketName,
-		 	objectName,
-		  	bytes.NewReader(fileBytes), 
-		  	fileSize,
+			objectName,
+			bytes.NewReader(fileBytes),
+			fileSize,
 			minio.PutObjectOptions{ContentType: parsedFT[0], PartSize: uint64(partSize)})
+		if err != nil {
+			fmt.Println("Upload photo error:", err)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Can't upload file"})
+			return
+		}
 
-	if err != nil {
-		fmt.Println("upload photo error:", err) 
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "can't upload file"})
+		newPhoto  := entity.Photo {
+			Title: filepath.Base(uploadedPhoto.Key),
+			Path: uploadedPhoto.Key,
+			ListingID: id ,
+		}
+
+		uploadedFiles = append(uploadedFiles, newPhoto)
 	}
 
-	updatedListing, err := c.service.UploadPhoto(id, &uploadedPhoto )
-	
-	
-	if err != nil {
-		fmt.Println("update listing error:", err) // Print the error message for debugging
+	// Process the uploaded files (e.g., update a listing with the photos)
+    updatedListing, err := c.service.UploadPhotos(id, uploadedFiles)
+    if err != nil {
+        fmt.Println("Update listing error:", err)
+        ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload photos"})
+        return
+    }
 
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload photo"})
-		return
-	}
+    // Return a success message indicating all photos were uploaded successfully
+    ctx.JSON(http.StatusOK, gin.H{"message": "Photos updated successfully", "data": updatedListing})
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Photo updated successfully", "data": updatedListing})
 }
 
 

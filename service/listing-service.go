@@ -4,9 +4,6 @@ import (
 	"afizsavage/api-poc/entity"
 	"afizsavage/api-poc/repository"
 	"fmt"
-	"path/filepath"
-
-	"github.com/minio/minio-go/v7"
 )
 
 type ListingService interface {
@@ -16,7 +13,7 @@ type ListingService interface {
 	DeletePhoto(listingID uint, photo entity.Photo ) (entity.Listing, error)
 	GetAll() []entity.Listing
 	GenerateUniqueID() uint64
-	UploadPhoto(uint, *minio.UploadInfo) (entity.Listing, error)
+	UploadPhotos(uint, []entity.Photo) (entity.Listing, error)
 	GetByID(uint) (entity.Listing, error)
 }
 
@@ -42,20 +39,14 @@ func (service *listingService) Save(listing entity.Listing) (entity.Listing, err
     return savedListing, nil // Return nil for the error here
 }
 
-func (service *listingService) UploadPhoto(id uint, uploadedInfo *minio.UploadInfo ) (entity.Listing, error) {
+func (service *listingService) UploadPhotos(id uint, uploadedPhotos []entity.Photo ) (entity.Listing, error) {
 	existingListing, err := service.listingRepository.GetByID(id)
 
 	if err != nil {
 		return entity.Listing{}, err
 	}
 
-	newPhoto  := entity.Photo {
-		Title: filepath.Base(uploadedInfo.Key),
-		Path: uploadedInfo.Key,
-		ListingID: existingListing.ID ,
-	}
-
-	existingListing.Photos = append(existingListing.Photos, newPhoto)
+	existingListing.Photos = append(existingListing.Photos, uploadedPhotos...)
 	updatedListing, err := service.listingRepository.Update(existingListing)
 
 	if err != nil {

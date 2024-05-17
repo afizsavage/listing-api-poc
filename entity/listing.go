@@ -12,6 +12,7 @@ type Photo struct {
 	Path      string `json:"Path" gorm:"type:varchar(250)"`
 	ListingID uint   
 }
+
 type Listing struct {
 	gorm.Model
 	Country    string         `json:"Country" gorm:"type:varchar(200)"`
